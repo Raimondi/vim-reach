@@ -4,12 +4,12 @@ silent! exec 'sign define ' . s:sign . ' linehl= text==> texthl=WarningMsg'
 function! reach#mark(lnum)
   let next_id = s:top_id() + 1
   silent exec 'sign place ' . next_id . ' line=' . a:lnum
-        \ . ' name=' . s:sign . ' buffer=' . bufnr('.')
+        \ . ' name=' . s:sign . ' buffer=' . bufnr('%')
 endfunction
 
 function! reach#unmark(lnum)
   for id in s:get_signs(a:lnum)
-    silent! exec 'sign unplace ' . id . ' buffer=' . bufnr('.')
+    silent! exec 'sign unplace ' . id . ' buffer=' . bufnr('%')
   endfor
 endfunction
 
@@ -39,7 +39,7 @@ function! reach#clear()
   let ids = []
   call map(values(s:get_signs()), 'extend(ids, v:val)')
   for id in ids
-    silent! exec 'sign unplace ' . id . ' buffer=' . bufnr('.')
+    silent! exec 'sign unplace ' . id . ' buffer=' . bufnr('%')
   endfor
 endfunction
 
@@ -55,9 +55,9 @@ function! s:top_id()
 endfunction
 
 function! s:get_signs(...)
-  let output = s:redir('sign place buffer=' . bufnr('.'))
-  let lines = map(split(output, '\n')[2:], 'split(v:val, ''\s\+\w\+='')')
-  call filter(lines, 'v:val[2] ==# s:sign')
+  let lines = split(s:redir('sign place buffer=' . bufnr('%')), '\n')
+  call map(lines, 'split(v:val, ''\s\+\w\+='')')
+  call filter(lines, 'len(v:val) == 3 && v:val[2] ==# s:sign')
   let lnums = {}
   while !empty(lines)
     let [lnum, id; _] = remove(lines, 0)
