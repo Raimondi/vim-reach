@@ -1,4 +1,4 @@
-let reach#sign = 'reach_marks'
+let s:sign = 'reach_marks'
 silent! exec 'sign define ' . s:sign . ' linehl= text==> texthl=WarningMsg'
 
 function! reach#mark(lnum)
@@ -28,7 +28,12 @@ function! reach#do(...)
     " say something
     return
   endif
-  exec 'g/\m' . pat . '/' . cmd
+  let keep = exists(':keeppatterns') ? 'keeppatterns ' : ''
+  exec keep . 'g/\m' . pat . '/' . cmd
+  if !exists(':keeppatterns')
+    call histdel('search', -1)
+    silent .g//
+  endif
 endfunction
 
 function! reach#list()
